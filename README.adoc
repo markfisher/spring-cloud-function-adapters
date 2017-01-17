@@ -7,6 +7,5 @@
 == Upload
 
 ----
-aws lambda create-function --function-name Uppercase --role arn:aws:iam::[USERID]:role/service-role/[ROLE] --zip-file fileb://target/spring-cloud-function-adapter-aws-1.0.0.BUILD-SNAPSHOT.jar --handler example.Handler::handleEvent --description "Spring Cloud Function Adapter Example" --runtime java8 --region us-east-1 --timeout 30 --memory-size 1024 --publish
+aws lambda create-function --function-name Uppercase --role arn:aws:iam::[USERID]:role/service-role/[ROLE] --zip-file fileb://spring-cloud-function-adapter-sample/target/spring-cloud-function-adapter-sample-1.0.0.BUILD-SNAPSHOT.jar --handler example.Handler::handleEvent --description "Spring Cloud Function Adapter Example" --runtime java8 --region us-east-1 --timeout 30 --memory-size 1024 --publish
 ----
-
