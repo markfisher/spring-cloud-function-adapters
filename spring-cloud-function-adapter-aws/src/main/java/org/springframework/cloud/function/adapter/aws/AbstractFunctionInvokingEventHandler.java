@@ -44,7 +44,7 @@ public abstract class AbstractFunctionInvokingEventHandler<E> {
 	}
 
 	public void handleEvent(E event, Context context) {
-		if (!this.initialized.compareAndSet(false, true)) {
+		if (this.initialized.compareAndSet(false, true)) {
 			initialize();
 		}
 		String input = convertEvent(event);
