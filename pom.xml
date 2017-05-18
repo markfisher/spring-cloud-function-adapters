@@ -8,7 +8,7 @@
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>spring-cloud-function-adpater-parent</name>
+	<name>spring-cloud-function-adapter-parent</name>
 
 	<dependencyManagement>
 		<dependencies>

@@ -16,16 +16,18 @@
 
 package example;
 
+import java.util.Map;
+
 import org.springframework.cloud.function.adapter.aws.AbstractFunctionInvokingEventHandler;
 
-public class Handler extends AbstractFunctionInvokingEventHandler<String> {
+public class Handler extends AbstractFunctionInvokingEventHandler<Map<String,Object>> {
 
 	public Handler() {
 		super(Config.class);
 	}
 
 	@Override
-	protected String convertEvent(String event) {
+	protected Object convertEvent(Map<String, Object> event) {
 		return event;
 	}
 }

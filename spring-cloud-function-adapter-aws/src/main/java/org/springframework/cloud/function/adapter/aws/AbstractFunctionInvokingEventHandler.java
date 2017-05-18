@@ -16,13 +16,16 @@
 
 package org.springframework.cloud.function.adapter.aws;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
+import com.amazonaws.services.lambda.runtime.Context;
+
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import com.amazonaws.services.lambda.runtime.Context;
 
 import reactor.core.publisher.Flux;
 
@@ -33,7 +36,7 @@ public abstract class AbstractFunctionInvokingEventHandler<E> {
 
 	private final Class<?> configurationClass;
 
-	private Function<Flux<String>, Flux<String>> function;
+	private Function<Flux<?>, Flux<?>> function;
 
 	private AtomicBoolean initialized = new AtomicBoolean();
 
@@ -43,20 +46,36 @@ public abstract class AbstractFunctionInvokingEventHandler<E> {
 		this.configurationClass = configurationClass;
 	}
 
-	public void handleEvent(E event, Context context) {
+	public Object handleEvent(E event, Context context) {
 		if (this.initialized.compareAndSet(false, true)) {
 			initialize();
 		}
-		String input = convertEvent(event);
-		Flux<String> output = this.function.apply(Flux.just(input));
-		output.subscribe(System.out::println);
+		Object input = convertEvent(event);
+		Flux<?> output = this.function.apply(extract(input));
+		return result(output);
 	}
 
-	protected abstract String convertEvent(E event);
+	private Object result(Flux<?> output) {
+		List<Object> result = new ArrayList<>();
+		for (Object value : output.toIterable()) {
+			result.add(value);
+		}
+		return result;
+	}
+
+	private Flux<?> extract(Object input) {
+		if (input instanceof Collection) {
+			return Flux.fromIterable((Iterable<?>) input);
+		}
+		return Flux.just(input);
+	}
+
+	protected abstract Object convertEvent(E event);
 
 	@SuppressWarnings("unchecked")
 	private void initialize() {
-		SpringApplicationBuilder builder = new SpringApplicationBuilder(configurationClass);
+		SpringApplicationBuilder builder = new SpringApplicationBuilder(
+				configurationClass);
 		this.context = builder.web(false).run();
 		this.function = this.context.getBean("function", Function.class);
 	}

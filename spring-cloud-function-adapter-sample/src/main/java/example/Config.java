@@ -16,7 +16,9 @@
 
 package example;
 
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -29,11 +31,18 @@ import reactor.core.publisher.Flux;
 @EnableConfigurationProperties(Properties.class)
 public class Config {
 
-	@Autowired
 	private Properties props;
 
+	@Autowired
+	public Config(Properties props) {
+		this.props = props;
+	}
+
 	@Bean
-	public Function<Flux<String>, Flux<String>> function() {
-		return f -> f.map(s -> s.toUpperCase() + "-" + props.getFoo());
+	public Function<Flux<Map<String, String>>, Flux<Map<String, String>>> function() {
+		return f -> f.map(m -> m.entrySet().stream()
+				.collect(Collectors.toMap(e -> e.getKey(),
+						e -> e.getValue().toString().toUpperCase()
+								+ (props.getFoo() != null ? "-" + props.getFoo() : ""))));
 	}
 }

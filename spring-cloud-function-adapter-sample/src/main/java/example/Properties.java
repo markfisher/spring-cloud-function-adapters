@@ -18,7 +18,7 @@ package example;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties
+@ConfigurationProperties("app")
 public class Properties {
 
 	public String foo;
