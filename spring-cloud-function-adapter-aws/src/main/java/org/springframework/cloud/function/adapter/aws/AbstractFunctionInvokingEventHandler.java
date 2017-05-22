@@ -24,7 +24,11 @@ import java.util.function.Function;
 
 import com.amazonaws.services.lambda.runtime.Context;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cloud.function.registry.FunctionCatalog;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import reactor.core.publisher.Flux;
@@ -34,6 +38,8 @@ import reactor.core.publisher.Flux;
  */
 public abstract class AbstractFunctionInvokingEventHandler<E> {
 
+	private static Log logger = LogFactory.getLog(SpringBootHandler.class);
+	
 	private final Class<?> configurationClass;
 
 	private Function<Flux<?>, Flux<?>> function;
@@ -74,9 +80,16 @@ public abstract class AbstractFunctionInvokingEventHandler<E> {
 
 	@SuppressWarnings("unchecked")
 	private void initialize() {
+		logger.info("Initializing: " + configurationClass);
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(
 				configurationClass);
 		this.context = builder.web(false).run();
-		this.function = this.context.getBean("function", Function.class);
+		if (this.context.getBeanNamesForType(FunctionCatalog.class).length == 1) {
+			FunctionCatalog catalog = this.context.getBean(FunctionCatalog.class);
+			this.function = catalog.lookupFunction("function");
+		}
+		else {
+			this.function = this.context.getBean("function", Function.class);
+		}
 	}
 }

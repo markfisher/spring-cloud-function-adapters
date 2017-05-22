@@ -16,14 +16,15 @@
 
 package example;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.cloud.function.adapter.aws.SpringBootHandler;
 
-import reactor.core.publisher.Flux;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Dave Syer
@@ -33,12 +34,17 @@ public class MapTests {
 
 	@Test
 	public void test() {
-		Map<String, String> map = new LinkedHashMap<>();
+		Map<String, Object> map = new LinkedHashMap<>();
 		map.put("one", "foo");
 		map.put("two", "bar");
-		Flux<Map<String, String>> result = new Config(new Properties()).function()
-				.apply(Flux.just(map));
-		assertThat(result.blockFirst()).containsValue("FOO");
+		Map<String, Object> result = new Config(new Properties()).function().apply(map);
+		assertThat(result).containsValue("FOO");
+	}
+
+	@Test
+	public void start() throws Exception {
+		new SpringBootHandler(Config.class)
+				.handleEvent(Collections.singletonMap("name", "foo"), null);
 	}
 
 }

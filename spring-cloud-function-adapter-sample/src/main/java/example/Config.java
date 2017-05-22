@@ -21,13 +21,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-import reactor.core.publisher.Flux;
-
-@Configuration
+@SpringBootApplication
 @EnableConfigurationProperties(Properties.class)
 public class Config {
 
@@ -39,10 +38,15 @@ public class Config {
 	}
 
 	@Bean
-	public Function<Flux<Map<String, String>>, Flux<Map<String, String>>> function() {
-		return f -> f.map(m -> m.entrySet().stream()
+	public Function<Map<String, Object>, Map<String, Object>> function() {
+		return m -> m.entrySet().stream()
 				.collect(Collectors.toMap(e -> e.getKey(),
 						e -> e.getValue().toString().toUpperCase()
-								+ (props.getFoo() != null ? "-" + props.getFoo() : ""))));
+								+ (props.getFoo() != null ? "-" + props.getFoo() : "")));
 	}
+
+	public static void main(String[] args) throws Exception {
+		SpringApplication.run(Config.class, args);
+	}
+
 }
