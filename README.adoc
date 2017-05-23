@@ -4,8 +4,45 @@
 ./mvnw -U clean package
 ----
 
-== Upload
+== Upload function with no return value:
 
 ----
-aws lambda create-function --function-name Uppercase --role arn:aws:iam::[USERID]:role/service-role/[ROLE] --zip-file fileb://spring-cloud-function-adapter-sample/target/spring-cloud-function-adapter-sample-1.0.0.BUILD-SNAPSHOT.jar --handler example.Handler::handleEvent --description "Spring Cloud Function Adapter Example" --runtime java8 --region us-east-1 --timeout 30 --memory-size 1024 --publish
+aws lambda create-function --function-name Uppercase --role arn:aws:iam::[USERID]:role/service-role/[ROLE] --zip-file fileb://spring-cloud-function-adapter-sample/target/spring-cloud-function-adapter-sample-1.0.0.BUILD-SNAPSHOT.jar --handler example.Handler::handleEvent --description "Spring Cloud Function Adapter Example" --runtime java8 --region us-east-1 --timeout 30 --memory-size 1024 --publish --environment Variables={foo="uppercased by spring function"}
 ----
+
+== Invoke function with no return value:
+
+----
+aws lambda invoke --invocation-type RequestResponse --function-name Uppercase --region us-east-1 --log-type Tail --payload '"uppercased string"' output.txt | jq -r '.LogResult' | base64 --decode
+
+If jq is not available drop the "| jq -r '.LogResult' | base64 --decode" and pipe the value of the JSON element "LogResult" to base64, for example:
+
+aws lambda invoke --invocation-type RequestResponse --function-name Uppercase --region us-east-1 --log-type Tail --payload '"uppercased string"' output.txt
+
+echo "LogResultBase64Data" | base64 --decode
+
+----
+
+== Upload value returning function:
+
+----
+aws lambda create-function --function-name Uppercase --role arn:aws:iam::[USERID]:role/service-role/[ROLE] --zip-file fileb://spring-cloud-function-adapter-sample/target/spring-cloud-function-adapter-sample-1.0.0.BUILD-SNAPSHOT.jar --handler org.springframework.cloud.function.adapter.aws.FunctionInvokingRequestHandler --description "Spring Cloud Function Adapter Example" --runtime java8 --region us-east-1 --timeout 30 --memory-size 1024 --publish
+----
+
+== Invoke value returning function:
+
+----
+aws lambda invoke --invocation-type RequestResponse --function-name Uppercase --region us-east-1 --log-type Tail --payload '"uppercased string"' output.txt
+
+The returned function value will be in output.txt:
+
+cat output.txt
+
+The LogResult base64 data can also be decoded as with the non-value returning function. The decoded data will only contain request ID and resource usage data.
+----
+
+== Delete function
+----
+aws lambda delete-function --function-name Uppercase --region us-east-1
+----
+
