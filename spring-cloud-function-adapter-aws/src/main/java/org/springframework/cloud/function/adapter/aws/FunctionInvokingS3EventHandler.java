@@ -21,7 +21,7 @@ import com.amazonaws.services.lambda.runtime.events.S3Event;
 /**
  * @author Mark Fisher
  */
-public class FunctionInvokingS3EventHandler extends AbstractFunctionInvokingEventHandler<S3Event> {
+public class FunctionInvokingS3EventHandler extends SpringBootRequestHandler<S3Event, String> {
 
 	public FunctionInvokingS3EventHandler(Class<?> configurationClass) {
 		super(configurationClass);

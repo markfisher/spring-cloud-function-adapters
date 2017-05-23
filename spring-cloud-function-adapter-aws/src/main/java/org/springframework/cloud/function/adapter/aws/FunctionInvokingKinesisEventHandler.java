@@ -26,7 +26,7 @@ import com.amazonaws.services.lambda.runtime.events.KinesisEvent.KinesisEventRec
 /**
  * @author Mark Fisher
  */
-public class FunctionInvokingKinesisEventHandler extends AbstractFunctionInvokingEventHandler<KinesisEvent> {
+public class FunctionInvokingKinesisEventHandler extends SpringBootRequestHandler<KinesisEvent, String> {
 
 	public FunctionInvokingKinesisEventHandler(Class<?> configurationClass) {
 		super(configurationClass);

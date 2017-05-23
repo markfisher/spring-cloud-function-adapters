@@ -16,13 +16,9 @@
 
 package example;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.junit.Test;
 
-import org.springframework.cloud.function.adapter.aws.SpringBootHandler;
+import org.springframework.cloud.function.adapter.aws.SpringBootRequestHandler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,17 +30,15 @@ public class MapTests {
 
 	@Test
 	public void test() {
-		Map<String, Object> map = new LinkedHashMap<>();
-		map.put("one", "foo");
-		map.put("two", "bar");
-		Map<String, Object> result = new Config(new Properties()).function().apply(map);
-		assertThat(result).containsValue("FOO");
+		Bar result = new Config(new Properties()).function().apply(new Foo("foo"));
+		assertThat(result.getValue()).isEqualTo("FOO");
 	}
 
 	@Test
 	public void start() throws Exception {
-		new SpringBootHandler(Config.class)
-				.handleEvent(Collections.singletonMap("name", "foo"), null);
+		SpringBootRequestHandler<Object, Object> handler = new SpringBootRequestHandler<>(Config.class);
+		handler.handleRequest(new Foo("foo"), null);
+		handler.close();
 	}
 
 }

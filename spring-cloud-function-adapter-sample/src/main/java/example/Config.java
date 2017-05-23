@@ -16,9 +16,7 @@
 
 package example;
 
-import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -38,15 +36,62 @@ public class Config {
 	}
 
 	@Bean
-	public Function<Map<String, Object>, Map<String, Object>> function() {
-		return m -> m.entrySet().stream()
-				.collect(Collectors.toMap(e -> e.getKey(),
-						e -> e.getValue().toString().toUpperCase()
-								+ (props.getFoo() != null ? "-" + props.getFoo() : "")));
+	public Function<Foo, Bar> function() {
+		return value -> new Bar(value.uppercase()
+				+ (props.getFoo() != null ? "-" + props.getFoo() : ""));
 	}
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(Config.class, args);
+	}
+
+}
+
+class Foo {
+
+	private String value;
+
+	Foo() {
+	}
+
+	public String lowercase() {
+		return value.toLowerCase();
+	}
+
+	public Foo(String value) {
+		this.value = value;
+	}
+
+	public String uppercase() {
+		return value.toUpperCase();
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+}
+
+class Bar {
+
+	private String value;
+
+	Bar() {
+	}
+
+	public Bar(String value) {
+		this.value = value;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 }
